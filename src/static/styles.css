@@ -24,6 +24,46 @@ header {
   border-radius: 5px;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.admin-menu {
+  position: relative;
+}
+
+.user-button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: transparent;
+  font-size: 22px;
+}
+
+.admin-menu-panel {
+  position: absolute;
+  z-index: 2;
+  top: 52px;
+  right: 0;
+  width: 250px;
+  padding: 15px;
+  color: #333;
+  text-align: left;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-menu-panel p {
+  margin-bottom: 12px;
+}
+
 header h1 {
   margin-bottom: 10px;
 }
@@ -190,6 +230,25 @@ button:hover {
 
 .hidden {
   display: none;
+}
+
+dialog {
+  width: min(90vw, 380px);
+  margin: auto;
+  padding: 20px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 footer {
