@@ -8,8 +8,20 @@
   </head>
   <body>
     <header>
-      <h1>Mergington High School</h1>
-      <h2>Extracurricular Activities</h2>
+      <div class="header-content">
+        <div>
+          <h1>Mergington High School</h1>
+          <h2>Extracurricular Activities</h2>
+        </div>
+        <div class="admin-menu">
+          <button id="admin-menu-button" class="user-button" type="button" aria-label="Open teacher menu">👤</button>
+          <div id="admin-menu" class="admin-menu-panel hidden">
+            <p id="admin-status">Students can browse activities.</p>
+            <button id="login-button" type="button">Teacher login</button>
+            <button id="logout-button" class="hidden" type="button">Log out</button>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main>
@@ -23,6 +35,7 @@
 
       <section id="signup-container">
         <h3>Sign Up for an Activity</h3>
+        <p id="teacher-required" class="info">Teacher login is required to register or unregister students.</p>
         <form id="signup-form">
           <div class="form-group">
             <label for="email">Student Email:</label>
@@ -40,6 +53,24 @@
         <div id="message" class="hidden"></div>
       </section>
     </main>
+
+    <dialog id="login-dialog">
+      <form id="login-form" method="dialog">
+        <h3>Teacher login</h3>
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" required autocomplete="current-password" />
+        </div>
+        <div class="dialog-actions">
+          <button id="cancel-login-button" type="button">Cancel</button>
+          <button type="submit">Log in</button>
+        </div>
+      </form>
+    </dialog>
 
     <footer>
       <p>&copy; 2026 Mergington High School</p>

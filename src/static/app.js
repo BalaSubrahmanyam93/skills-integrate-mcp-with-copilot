@@ -3,6 +3,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const adminMenuButton = document.getElementById("admin-menu-button");
+  const adminMenu = document.getElementById("admin-menu");
+  const adminStatus = document.getElementById("admin-status");
+  const loginButton = document.getElementById("login-button");
+  const logoutButton = document.getElementById("logout-button");
+  const loginDialog = document.getElementById("login-dialog");
+  const loginForm = document.getElementById("login-form");
+  const cancelLoginButton = document.getElementById("cancel-login-button");
+  const teacherRequired = document.getElementById("teacher-required");
+  let isAdmin = false;
+
+  function updateAdminControls(username = "") {
+    isAdmin = Boolean(username);
+    signupForm.classList.toggle("hidden", !isAdmin);
+    teacherRequired.classList.toggle("hidden", isAdmin);
+    loginButton.classList.toggle("hidden", isAdmin);
+    logoutButton.classList.toggle("hidden", !isAdmin);
+    adminStatus.textContent = isAdmin
+      ? `Logged in as ${username}. Teacher controls are enabled.`
+      : "Students can browse activities.";
+  }
+
+  async function loadCurrentTeacher() {
+    const response = await fetch("/auth/me");
+    if (response.ok) {
+      const teacher = await response.json();
+      updateAdminControls(teacher.username);
+    } else {
+      updateAdminControls();
+    }
+  }
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -21,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft =
           details.max_participants - details.participants.length;
 
-        // Create participants HTML with delete icons instead of bullet points
+        // Only teachers receive controls that can change enrollment.
         const participantsHTML =
           details.participants.length > 0
             ? `<div class="participants-section">
@@ -30,7 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${details.participants
                   .map(
                     (email) =>
-                      `<li><span class="participant-email">${email}</span><button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button></li>`
+                      `<li><span class="participant-email">${email}</span>${
+                        isAdmin
+                          ? `<button class="delete-btn" data-activity="${name}" data-email="${email}" aria-label="Unregister ${email}">❌</button>`
+                          : ""
+                      }</li>`
                   )
                   .join("")}
               </ul>
@@ -155,6 +190,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  adminMenuButton.addEventListener("click", () => {
+    adminMenu.classList.toggle("hidden");
+  });
+
+  loginButton.addEventListener("click", () => {
+    adminMenu.classList.add("hidden");
+    loginDialog.showModal();
+  });
+
+  cancelLoginButton.addEventListener("click", () => {
+    loginDialog.close();
+    loginForm.reset();
+  });
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const response = await fetch("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const result = await response.json();
+
+    if (response.ok) {
+      updateAdminControls(result.username);
+      loginDialog.close();
+      loginForm.reset();
+      fetchActivities();
+      messageDiv.textContent = "Teacher mode enabled.";
+      messageDiv.className = "success";
+    } else {
+      messageDiv.textContent = result.detail || "Login failed.";
+      messageDiv.className = "error";
+    }
+    messageDiv.classList.remove("hidden");
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    await fetch("/auth/logout", { method: "POST" });
+    updateAdminControls();
+    adminMenu.classList.add("hidden");
+    fetchActivities();
+    messageDiv.textContent = "Teacher mode disabled.";
+    messageDiv.className = "success";
+    messageDiv.classList.remove("hidden");
+  });
+
   // Initialize app
-  fetchActivities();
+  loadCurrentTeacher().then(fetchActivities);
 });
